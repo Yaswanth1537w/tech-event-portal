@@ -1,5 +1,4 @@
 'use client';
-
 import { ChangeEvent, FormEvent, useCallback, useEffect, useMemo, useState } from 'react';
 import { createBrowserClient } from '@supabase/ssr';
 import * as XLSX from 'xlsx';

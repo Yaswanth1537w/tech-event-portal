@@ -1,22 +1,20 @@
-import { redirect } from "next/navigation";
-import { Suspense } from "react";
-import { getCurrentProfile } from "@/lib/auth/profile";
-import { roleHome } from "@/lib/auth/roles";
+import { redirect } from 'next/navigation'
+import { createClient } from '@/lib/supabase/server'
 
-async function HomeRedirect() {
-  const profile = await getCurrentProfile();
+export default async function DashboardRoot() {
+  const supabase = await createClient()
+  const { data: { user } } = await supabase.auth.getUser()
 
-  if (!profile) {
-    redirect("/login");
+  if (!user) {
+    redirect('/login')
   }
 
-  redirect(roleHome(profile.role));
-}
+  const { data: profile } = await supabase
+    .from('profiles')
+    .select('role')
+    .eq('id', user.id)
+    .single()
 
-export default function Home() {
-  return (
-    <Suspense fallback={<main className="p-8 text-ink/60">Opening your desk…</main>}>
-      <HomeRedirect />
-    </Suspense>
-  );
+  const role = profile?.role || 'student'
+  redirect(`/dashboard/${role}`)
 }
